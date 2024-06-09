@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import gamesRoutes from './routes/games.js'
 import reviewsRoutes from './routes/reviews.js'
 import logger from './middleware/logger.js'
 import errorHandler from './middleware/error.js'
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(logger)
 
 // Routes
+app.use('/api/games', gamesRoutes)
 app.use('/api/reviews', reviewsRoutes)
 
 // Error handler
