@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { HttpError } from '@/middleware/error'
 import { ControllerRequest } from './types'
+import Game from '@/models/gameModel'
 
 let games = [
   {
@@ -8,8 +9,10 @@ let games = [
     name: 'Prince of Persia: The Lost Crown',
     description:
       'Dash into a stylish and thrilling action-adventure platformer game set in a mythological Persian world where the boundaries of time and space are yours to manipulate. Use your Time Powers, combat and platforming skills to perform deadly combos and defeat time-corrupted enemies and mythological creatures. Acquire and equip new Amulets at shopkeepers to play as you see fit. Discover a cursed Persian-inspired world filled with bigger-than-life landmarks. Explore a variety of highly detailed biomes, each with its own identity, wonders and dangers. Use your wits to solve puzzles, find hidden treasures and complete quests to learn more about this corrupted place. Immerse yourself into a Persian mythological fantasy through an intriguing and original story. Cross paths with colorful characters to better unravel the mysteries of Mount Qaf. Enjoy high quality graphics, immersive cinematics and fresh Artistic Direction, along with a unique gameplay fluidity thanks to 60 fps rate on all platforms.',
-    bannerImageUrl: 'https://example.com/prince_of_persia_banner.png',
-    cardImageUrl: 'https://example.com/prince_of_persia_card.png',
+    bannerImageUrl:
+      'https://raw.githubusercontent.com/Wtheodoro/play-vuerdict/main/src/assets/images/princeOfPersiaBanner.png',
+    cardImageUrl:
+      'https://raw.githubusercontent.com/Wtheodoro/play-vuerdict/main/src/assets/images/princeOfPersia.avif',
     releaseDate: '2024-06-01',
     developer: 'Ubisoft',
     publisher: 'Ubisoft',
@@ -67,40 +70,105 @@ let games = [
 
 // @desc Get all games
 // @route GET /api/games
-const getGames = (
+const getGames = async (
   request: ControllerRequest<{ limit: string }>,
   response: Response
 ) => {
   const limit = parseInt(request.query.limit)
 
-  if (!isNaN(limit) && limit > 0) {
-    return response.status(200).json(games.slice(0, limit))
-  }
+  try {
+    const allGames = await Game.find().limit(limit || 100)
 
-  response.status(200).json(games)
+    return response.status(200).json(allGames)
+  } catch (error) {
+    return response
+      .status(500)
+      .json({ message: 'Failed to get all game', error })
+  }
 }
 
 // @desc Get one game by id
 // @route GET /api/games/:id
-const getGame = (request: Request, response: Response, next: NextFunction) => {
-  const requestGameId = parseInt(request.params.id)
-  const currentGame = games.find((game) => game.id === requestGameId)
+const getGame = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  const requestGameId = request.params.id
 
-  if (!currentGame) {
-    const error: HttpError = new Error(
-      `Game from id of ${requestGameId} was not found.`
-    )
-    error.status = 404
+  try {
+    const currentGame = await Game.findById(requestGameId)
 
+    return response.status(200).json(currentGame)
+  } catch (error) {
+    response.status(500).json({ message: 'Failed to get game', error })
     return next(error)
   }
+}
 
-  response.status(200).json(currentGame)
+// @desc Create one game
+// @route POST /api/games/internal
+const createGame = async (request: Request, response: Response) => {
+  const {
+    name,
+    description,
+    bannerImageUrl,
+    cardImageUrl,
+    releaseDate,
+    developer,
+    publisher,
+    genre,
+    platforms,
+    rating,
+    slug,
+  } = request.body
+
+  if (
+    !name ||
+    !description ||
+    !bannerImageUrl ||
+    !cardImageUrl ||
+    !releaseDate ||
+    !developer ||
+    !publisher ||
+    !genre ||
+    !platforms ||
+    !rating ||
+    !slug
+  ) {
+    return response.status(400).json({ message: 'All fields are required' })
+  }
+
+  const newGame = new Game({
+    name,
+    description,
+    bannerImageUrl,
+    cardImageUrl,
+    releaseDate,
+    developer,
+    publisher,
+    genre,
+    platforms,
+    rating,
+    slug,
+  })
+
+  try {
+    const savedGame = await newGame.save()
+
+    return response.status(201).json(savedGame)
+  } catch (error) {
+    console.error('Error creating game:', error)
+    return response
+      .status(500)
+      .json({ message: 'Failed to create game', error })
+  }
 }
 
 const GamesController = {
   getGame,
   getGames,
+  createGame,
 }
 
 export default GamesController
