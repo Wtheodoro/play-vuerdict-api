@@ -35,12 +35,10 @@ MONGODB_URI: The MongoDB connection URI.
 ## Execution
 
 ```bash
-npm start
+npm run dev
 ```
 
 The server will start and be accessible at http://localhost:3000 (or on the port you configured).
-
-## Configuration
 
 ### Games
 
