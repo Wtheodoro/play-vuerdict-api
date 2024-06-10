@@ -4,28 +4,33 @@ import cors from 'cors'
 import { gameRoutes, reviewRoutes } from './routes'
 import { errorHandler, notFound } from './middleware'
 
-config.init()
-const app = express()
-const port = config.env.PORT
+const startServer = async () => {
+  await config.init()
 
-// Enable CORS
-app.use(cors())
+  const app = express()
+  const port = config.env.PORT
 
-// Body parser middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+  // Enable CORS
+  app.use(cors())
 
-// Logger middleware
-// app.use(logger)
+  // Body parser middleware
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: false }))
 
-// Routes
-app.use('/api/games', gameRoutes)
-app.use('/api/reviews', reviewRoutes)
+  // Logger middleware
+  // app.use(logger)
 
-// Error handler
-app.use(notFound)
-app.use(errorHandler)
+  // Routes
+  app.use('/api/games', gameRoutes)
+  app.use('/api/reviews', reviewRoutes)
 
-app.listen(port, () =>
-  console.log(`Server is running on port: http://localhost:${port}`)
-)
+  // Error handler
+  app.use(notFound)
+  app.use(errorHandler)
+
+  app.listen(port, () =>
+    console.log(`Server is running on port: http://localhost:${port}`)
+  )
+}
+
+startServer()

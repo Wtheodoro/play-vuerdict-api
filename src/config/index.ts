@@ -1,7 +1,8 @@
+import connectDb from '@/database/database'
 import dotenv from 'dotenv'
 
 interface Config {
-  init(): void
+  init(): Promise<void>
   env: {
     PORT: number
     DB_CONNECT_URI: string
@@ -9,7 +10,7 @@ interface Config {
 }
 
 const config: Config = {
-  init: () => {
+  init: async () => {
     console.log('Initializing configuration...')
     dotenv.config()
 
@@ -25,6 +26,9 @@ const config: Config = {
       )
       process.exit(1)
     }
+
+    console.log('Initializing database...')
+    await connectDb()
   },
 
   env: {} as Config['env'],
