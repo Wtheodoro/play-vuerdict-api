@@ -1,10 +1,12 @@
+import config from './config'
 import express from 'express'
 import cors from 'cors'
 import { gameRoutes, reviewRoutes } from './routes'
 import { errorHandler, notFound } from './middleware'
 
+config.init()
 const app = express()
-const port = process.env.PORT || 8000
+const port = config.env.PORT
 
 // Enable CORS
 app.use(cors())
