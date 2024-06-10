@@ -1,3 +1,7 @@
+import { Request, Response, NextFunction } from 'express'
+import { HttpError } from '@/middleware/error'
+import { ControllerRequest } from './types'
+
 let games = [
   {
     id: 1,
@@ -63,7 +67,10 @@ let games = [
 
 // @desc Get all games
 // @route GET /api/games
-export const getGames = (request, response) => {
+const getGames = (
+  request: ControllerRequest<{ limit: string }>,
+  response: Response
+) => {
   const limit = parseInt(request.query.limit)
 
   if (!isNaN(limit) && limit > 0) {
@@ -75,12 +82,14 @@ export const getGames = (request, response) => {
 
 // @desc Get one game by id
 // @route GET /api/games/:id
-export const getGame = (request, response, next) => {
+const getGame = (request: Request, response: Response, next: NextFunction) => {
   const requestGameId = parseInt(request.params.id)
   const currentGame = games.find((game) => game.id === requestGameId)
 
   if (!currentGame) {
-    const error = new Error(`Game from id of ${requestGameId} was not found.`)
+    const error: HttpError = new Error(
+      `Game from id of ${requestGameId} was not found.`
+    )
     error.status = 404
 
     return next(error)
@@ -88,3 +97,10 @@ export const getGame = (request, response, next) => {
 
   response.status(200).json(currentGame)
 }
+
+const GamesController = {
+  getGame,
+  getGames,
+}
+
+export default GamesController

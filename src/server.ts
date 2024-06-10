@@ -1,10 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import gamesRoutes from './routes/games.js'
-import reviewsRoutes from './routes/reviews.js'
-import logger from './middleware/logger.js'
-import errorHandler from './middleware/error.js'
-import notFound from './middleware/notFound.js'
+import { gameRoutes, reviewRoutes } from './routes'
+import { errorHandler, notFound } from './middleware'
 
 const app = express()
 const port = process.env.PORT || 8000
@@ -17,11 +14,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 // Logger middleware
-app.use(logger)
+// app.use(logger)
 
 // Routes
-app.use('/api/games', gamesRoutes)
-app.use('/api/reviews', reviewsRoutes)
+app.use('/api/games', gameRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 // Error handler
 app.use(notFound)

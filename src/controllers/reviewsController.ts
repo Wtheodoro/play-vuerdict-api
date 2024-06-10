@@ -1,3 +1,7 @@
+import { HttpError } from '@/middleware/error'
+import { Request, Response, NextFunction } from 'express'
+import { ControllerRequest } from './types'
+
 let reviews = [
   {
     id: 1,
@@ -111,7 +115,10 @@ let reviews = [
 
 // @desc Get all reviews
 // @route GET /api/reviews
-export const getReviews = (request, response) => {
+export const getReviews = (
+  request: ControllerRequest<{ limit: string }>,
+  response: Response
+) => {
   const limit = parseInt(request.query.limit)
 
   if (!isNaN(limit) && limit > 0) {
@@ -123,14 +130,18 @@ export const getReviews = (request, response) => {
 
 // @desc Get reviews from a specific game
 // @route GET /api/reviews/:gameId
-export const getGameReviews = (request, response, next) => {
+export const getGameReviews = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   const requestGameId = parseInt(request.params.gameId)
   const currentGameReviews = reviews.filter(
     (review) => review.gameId === requestGameId
   )
 
   if (!currentGameReviews.length) {
-    const error = new Error(
+    const error: HttpError = new Error(
       `Reviews from the game id of ${requestGameId} was not found.`
     )
     error.status = 404
@@ -143,7 +154,11 @@ export const getGameReviews = (request, response, next) => {
 
 // @desc Create new review
 // @route POST /api/reviews
-export const createReview = (request, response, next) => {
+export const createReview = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   const newReview = {
     id: reviews.length + 1,
     gameId: request.body.gameId,
@@ -154,7 +169,7 @@ export const createReview = (request, response, next) => {
   }
 
   if (!newReview.review) {
-    const error = new Error('Please include a review')
+    const error: HttpError = new Error('Please include a review')
     error.status = 400
 
     return next(error)
@@ -167,13 +182,17 @@ export const createReview = (request, response, next) => {
 
 // @desc Update a review
 // @route PUT /api/reviews/:id
-export const updateReview = (request, response, next) => {
+export const updateReview = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   const reviewId = parseInt(request.params.id)
   const currentReview = reviews.find((review) => review.id === reviewId)
 
   if (!currentReview) {
-    const error = new Error(
-      `Reviews from the game id of ${requestGameId} was not found.`
+    const error: HttpError = new Error(
+      `Reviews from the game id of ${reviewId} was not found.`
     )
     error.status = 404
 
@@ -186,13 +205,17 @@ export const updateReview = (request, response, next) => {
 
 // @desc Delete a review
 // @route DELETE /api/reviews/:id
-export const deleteReview = (request, response, next) => {
+export const deleteReview = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   const reviewId = parseInt(request.params.id)
   const currentReview = reviews.find((review) => review.id === reviewId)
 
   if (!currentReview) {
-    const error = new Error(
-      `Reviews from the game id of ${requestGameId} was not found.`
+    const error: HttpError = new Error(
+      `Reviews from the game id of ${reviewId} was not found.`
     )
     error.status = 404
 
@@ -202,3 +225,13 @@ export const deleteReview = (request, response, next) => {
   reviews = reviews.filter((review) => review.id !== reviewId)
   response.status(200).json(reviews)
 }
+
+const ReviewsController = {
+  getReviews,
+  getGameReviews,
+  createReview,
+  updateReview,
+  deleteReview,
+}
+
+export default ReviewsController
