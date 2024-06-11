@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import chalk, { ChalkInstance } from 'chalk'
+import chalk from 'chalk'
 
 const logger = (request: Request, response: Response, next: NextFunction) => {
   const { method, protocol, originalUrl } = request
@@ -11,15 +11,15 @@ const logger = (request: Request, response: Response, next: NextFunction) => {
     DELETE: chalk.red,
   }
 
-  const colorize: ChalkInstance =
-    methodColors[method as keyof typeof methodColors] || chalk.white
+  console.log(method)
+  const colorize = methodColors[method] || chalk.white
 
   console.log(
     colorize(
       `
-      ${method} 
-      ${protocol}://${request.get('host')}${originalUrl}
-      `
+    ${method} 
+    ${protocol}://${request.get('host')}${originalUrl}
+    `
     )
   )
 

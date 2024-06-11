@@ -1,6 +1,7 @@
 import config from './config'
 import express from 'express'
 import cors from 'cors'
+import logger from './middleware/logger'
 import { gameRoutes, reviewRoutes } from './routes'
 import { errorHandler, notFound } from './middleware'
 
@@ -18,7 +19,7 @@ const startServer = async () => {
   app.use(express.urlencoded({ extended: false }))
 
   // Logger middleware
-  // app.use(logger)
+  app.use(logger)
 
   // Routes
   app.use('/api/games', gameRoutes)
