@@ -1,4 +1,5 @@
 import config from './config'
+import axios from 'axios'
 import express from 'express'
 import cors from 'cors'
 import logger from './middleware/logger'
@@ -25,6 +26,35 @@ const startServer = async () => {
   app.use('/api/games', gameRoutes)
   app.use('/api/reviews', reviewRoutes)
 
+  
+
+  // test route
+  app.get('/challenge/menu', async (req, res) => {
+    try {
+      const apiUrl = 'https://cdn-dev.preoday.com/challenge/menu';
+      
+      const response = await axios.get(apiUrl);
+      
+      res.json(response.data);
+    } catch (error) {
+      console.error('Erro ao acessar a API externa:', error);
+      res.status(500).json({ error: 'Erro ao acessar a API externa' });
+    }
+  });
+
+  app.get('/challenge/venue/9', async (req, res) => {
+    try {
+      const apiUrl = 'https://cdn-dev.preoday.com/challenge/venue/9';
+      
+      const response = await axios.get(apiUrl);
+      
+      res.json(response.data);
+    } catch (error) {
+      console.error('Erro ao acessar a API externa:', error);
+      res.status(500).json({ error: 'Erro ao acessar a API externa' });
+    }
+  });
+
   // Error handler
   app.use(notFound)
   app.use(errorHandler)
@@ -33,5 +63,7 @@ const startServer = async () => {
     console.log(`Server is running on port: http://localhost:${port}`)
   )
 }
+
+
 
 startServer()
